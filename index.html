@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>Painel Administrativo - Ai Tech 360</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #3e2723 0%, #5d4037 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            color: #fff;
+        }
+        
+        .container {
+            padding: 12px;
+            max-width: 100%;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .container.menu-open {
+            transform: translateX(280px);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #6d4c41 0%, #8d6e63 100%);
+            color: white;
+            padding: 20px 15px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+        
+        .menu-btn {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            z-index: 2;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .menu-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+        
+        .header-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            flex: 1;
+            padding: 0 15px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.5px;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .admin-btn {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.3);
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .admin-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 18px 12px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.7s;
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .stat-number {
+            font-size: 20px;
+            font-weight: 800;
+            color: #d7ccc8;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.3;
+            font-weight: 500;
+        }
+        
+        .tab-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 18px 8px;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.7);
+            min-width: 120px;
+        }
+        
+        .tab.active {
+            border-bottom-color: #d7ccc8;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+        
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .list-container {
+            max-height: 60vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .item-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            margin: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-left: 4px solid #8d6e63;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .item-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+        
+        .item-card:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .item-card:last-child {
+            border-bottom: none;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            color: #fff;
+            font-size: 16px;
+            letter-spacing: 0.3px;
+        }
+        
+        .item-date {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .item-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .detail-item {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 14px 10px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .detail-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+        
+        .detail-value {
+            font-weight: 700;
+            color: #d7ccc8;
+            font-size: 14px;
+            margin-top: 4px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn-approve {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+        }
+        
+        .btn-reject {
+            background: linear-gradient(135deg, #f44336, #e53935);
+            color: white;
+        }
+        
+        .btn-pending {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+        }
+        
+        .btn-process {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 14px;
+            display: inline-block;
+        }
+        
+        .status-pending {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffb74d;
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+        
+        .status-approved {
+            background: rgba(76, 175, 80, 0.2);
+            color: #81c784;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .status-rejected {
+            background: rgba(244, 67, 54, 0.2);
+            color: #e57373;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .empty-state div {
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255,255,255,0.8);
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        /* Menu Hamburguer */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: linear-gradient(135deg, #4e342e 0%, #3e2723 100%);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        
+        .side-menu.open {
+            left: 0;
+        }
+        
+        .menu-header {
+            background: linear-gradient(135deg, #6d4c41 0%, #8d6e63 100%);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .menu-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .menu-subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .menu-items {
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            padding: 16px 25px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #d7ccc8;
+        }
+        
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: #d7ccc8;
+        }
+        
+        .menu-item i {
+            margin-right: 15px;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+        
+        /* Melhorias para scroll */
+        .list-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .list-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .list-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        
+        .list-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .item-card {
+            animation: fadeIn 0.4s ease;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #5d4037 0%, #4e342e 100%);
+            padding: 0;
+            border-radius: 16px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow: auto;
+            width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #6d4c41 0%, #8d6e63 100%);
+            color: #fff;
+            padding: 20px;
+            margin: 0;
+            text-align: center;
+            font-weight: 700;
+            font-size: 18px;
+            border-radius: 16px 16px 0 0;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            gap: 12px;
+        }
+        
+        .modal-button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        
+        .modal-button.confirm {
+            background: linear-gradient(135deg, #8d6e63 0%, #6d4c41 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(109, 76, 65, 0.4);
+        }
+        
+        .modal-button.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(109, 76, 65, 0.6);
+        }
+        
+        .modal-button.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255,255,255,0.9);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .modal-button.cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        /* Responsividade */
+        @media (max-width: 360px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .stats-grid {
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 15px 10px;
+            }
+            
+            .stat-number {
+                font-size: 18px;
+            }
+            
+            .tab {
+                padding: 16px 6px;
+                font-size: 13px;
+                min-width: 100px;
+            }
+            
+            .item-card {
+                padding: 16px;
+            }
+            
+            .item-details {
+                gap: 8px;
+            }
+            
+            .detail-item {
+                padding: 12px 8px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .admin-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .admin-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Menu Hamburguer -->
+<div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+        <div class="menu-title">Painel Admin</div>
+        <div class="menu-subtitle">Ai Tech 360</div>
+    </div>
+    <div class="menu-items">
+        <div class="menu-item active" onclick="switchTab('dashboard')">
+            <i>📊</i> Dashboard
+        </div>
+        <div class="menu-item" onclick="switchTab('deposits')">
+            <i>💰</i> Depósitos
+        </div>
+
+        </div>
+        <div>
+            <a href="index1.html">💳Contas de todos</a> 
+        </div>
+
+        <div class="menu-item" onclick="switchTab('withdrawals')">
+            <i>💳</i> Saques
+        </div>
+        <div class="menu-item" onclick="switchTab('users')">
+            <i>👥</i> Usuários
+        </div>
+        <div class="menu-item" onclick="switchTab('transactions')">
+            <i>📝</i> Transações
+        </div>
+        <div class="menu-item" onclick="processPayouts()">
+            <i>🔄</i> Processar Rendimentos
+        </div>
+        <div class="menu-item" onclick="showSystemStats()">
+            <i>📈</i> Estatísticas do Sistema
+        </div>
+        <div class="menu-item" onclick="showAdminTools()">
+            <i>⚙️</i> Ferramentas Admin
+        </div>
+    </div>
+</div>
+
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+<div class="container" id="mainContainer">
+    <!-- Cabeçalho -->
+    <div class="header">
+        <div class="menu-btn" onclick="toggleMenu()">
+            <img src="https://i.postimg.cc/CxzSVgWm/back.png" alt="Menu" width="20" height="20">
+        </div>
+        <div class="header-title" id="pageTitle">Painel Administrativo</div>
+        <div class="admin-actions">
+            <div class="admin-btn" onclick="processPayouts()">
+                Rendimentos
+            </div>
+            <div class="admin-btn" onclick="refreshData()">
+                Atualizar
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas Gerais -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" id="totalUsers">0</div>
+            <div class="stat-label">Total de Usuários</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="totalBalance">KZ 0</div>
+            <div class="stat-label">Saldo Total</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="pendingDeposits">0</div>
+            <div class="stat-label">Depósitos Pendentes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="pendingWithdrawals">0</div>
+            <div class="stat-label">Saques Pendentes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="totalDeposits">KZ 0</div>
+            <div class="stat-label">Total Depósitos</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="totalWithdrawals">KZ 0</div>
+            <div class="stat-label">Total Saques</div>
+        </div>
+    </div>
+
+    <!-- Abas -->
+    <div class="tab-container">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('deposits')">Depósitos</div>
+            <div class="tab" onclick="switchTab('withdrawals')">Saques</div>
+            <div class="tab" onclick="switchTab('users')">Usuários</div>
+            <div class="tab" onclick="switchTab('transactions')">Transações</div>
+        </div>
+
+        <!-- Conteúdo Depósitos -->
+        <div class="tab-content active" id="depositsContent">
+            <div class="list-container" id="depositsList">
+                <div class="loading">Carregando depósitos...</div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Saques -->
+        <div class="tab-content" id="withdrawalsContent">
+            <div class="list-container" id="withdrawalsList">
+                <div class="loading">Carregando saques...</div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Usuários -->
+        <div class="tab-content" id="usersContent">
+            <div class="list-container" id="usersList">
+                <div class="loading">Carregando usuários...</div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Transações -->
+        <div class="tab-content" id="transactionsContent">
+            <div class="list-container" id="transactionsList">
+                <div class="loading">Carregando transações...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal-overlay" id="confirmationModal">
+    <div class="modal-content">
+        <div class="modal-header" id="modalTitle">Confirmar Ação</div>
+        <div class="modal-body">
+            <div id="modalMessage">Tem certeza que deseja executar esta ação?</div>
+            <div class="modal-buttons">
+                <button class="modal-button cancel" onclick="closeModal()">Cancelar</button>
+                <button class="modal-button confirm" id="confirmAction">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Configuração da API
+const API_BASE_URL = 'https://bd-p4q7.onrender.com'; // Substitua pela URL real da API
+const ADMIN_TOKEN = 'admin_secret_token_123'; // Em produção, usar sistema de login seguro
+
+// Estado global
+let currentData = {
+    deposits: [],
+    withdrawals: [],
+    users: [],
+    transactions: []
+};
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+    setInterval(loadDashboardData, 30000); // Atualizar a cada 30 segundos
+});
+
+// Alternar menu hamburguer
+function toggleMenu() {
+    const menu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('menuOverlay');
+    const container = document.getElementById('mainContainer');
+    
+    if (menu.classList.contains('open')) {
+        menu.classList.remove('open');
+        overlay.style.display = 'none';
+        container.classList.remove('menu-open');
+    } else {
+        menu.classList.add('open');
+        overlay.style.display = 'block';
+        container.classList.add('menu-open');
+    }
+}
+
+// Carregar dados do dashboard
+async function loadDashboardData() {
+    try {
+        await Promise.all([
+            loadStatistics(),
+            loadDeposits(),
+            loadWithdrawals(),
+            loadUsers(),
+            loadTransactions()
+        ]);
+    } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        showError('Erro ao carregar dados do painel');
+    }
+}
+
+// Carregar estatísticas
+async function loadStatistics() {
+    try {
+        // Buscar dados agregados
+        const [usersResponse, depositsResponse, withdrawalsResponse] = await Promise.all([
+            fetch(`${API_BASE_URL}/api/admin/users`, {
+                headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+            }),
+            fetch(`${API_BASE_URL}/api/admin/deposits`, {
+                headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+            }),
+            fetch(`${API_BASE_URL}/api/admin/withdrawals`, {
+                headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+            })
+        ]);
+
+        const usersData = await usersResponse.json();
+        const depositsData = await depositsResponse.json();
+        const withdrawalsData = await withdrawalsResponse.json();
+
+        if (usersData.success) {
+            document.getElementById('totalUsers').textContent = usersData.data.total || 0;
+            document.getElementById('totalBalance').textContent = `KZ ${formatNumber(usersData.data.total_balance || 0)}`;
+        }
+
+        if (depositsData.success) {
+            const pending = depositsData.data.filter(d => d.status === 'pending').length;
+            const total = depositsData.data.filter(d => d.status === 'completed').reduce((sum, d) => sum + d.amount, 0);
+            document.getElementById('pendingDeposits').textContent = pending;
+            document.getElementById('totalDeposits').textContent = `KZ ${formatNumber(total)}`;
+        }
+
+        if (withdrawalsData.success) {
+            const pending = withdrawalsData.data.filter(w => w.status === 'pending').length;
+            const total = withdrawalsData.data.filter(w => w.status === 'completed').reduce((sum, w) => sum + w.amount, 0);
+            document.getElementById('pendingWithdrawals').textContent = pending;
+            document.getElementById('totalWithdrawals').textContent = `KZ ${formatNumber(total)}`;
+        }
+
+    } catch (error) {
+        console.error('Erro ao carregar estatísticas:', error);
+    }
+}
+
+// Carregar depósitos
+async function loadDeposits() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/deposits`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            currentData.deposits = data.data;
+            renderDeposits();
+        } else {
+            showError('Erro ao carregar depósitos');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar depósitos:', error);
+        showError('Erro de conexão');
+    }
+}
+
+// Carregar saques
+async function loadWithdrawals() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/withdrawals`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            currentData.withdrawals = data.data;
+            renderWithdrawals();
+        } else {
+            showError('Erro ao carregar saques');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar saques:', error);
+        showError('Erro de conexão');
+    }
+}
+
+// Carregar usuários
+async function loadUsers() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            currentData.users = data.data.users || data.data;
+            renderUsers();
+        } else {
+            showError('Erro ao carregar usuários');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+        showError('Erro de conexão');
+    }
+}
+
+// Carregar transações
+async function loadTransactions() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/transactions`, {
+            headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            currentData.transactions = data.data;
+            renderTransactions();
+        } else {
+            showError('Erro ao carregar transações');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar transações:', error);
+        showError('Erro de conexão');
+    }
+}
+
+// Renderizar depósitos
+function renderDeposits() {
+    const container = document.getElementById('depositsList');
+    const deposits = currentData.deposits;
+
+    if (!deposits || deposits.length === 0) {
+        container.innerHTML = '<div class="empty-state">Nenhum depósito encontrado</div>';
+        return;
+    }
+
+    container.innerHTML = deposits.map(deposit => `
+        <div class="item-card">
+            <div class="item-header">
+                <div class="item-title">${deposit.user_mobile || 'Usuário ' + deposit.user_id}</div>
+                <div class="item-date">${formatDate(deposit.created_at)}</div>
+            </div>
+            <div class="item-details">
+                <div class="detail-item">
+                    <div class="detail-label">Valor</div>
+                    <div class="detail-value">KZ ${formatNumber(deposit.amount)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Banco</div>
+                    <div class="detail-value">${deposit.bank_name || '-'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Conta</div>
+                    <div class="detail-value">${deposit.account_name || '-'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">IBAN</div>
+                    <div class="detail-value">${deposit.iban ? deposit.iban.substring(0, 8) + '...' : '-'}</div>
+                </div>
+            </div>
+            ${deposit.receipt_image ? `
+                <div style="text-align: center; margin: 10px 0;">
+                    <img src="${deposit.receipt_image}" alt="Comprovante" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                </div>
+            ` : ''}
+            <div class="status-badge status-${deposit.status}">
+                ${getStatusText(deposit.status)}
+            </div>
+            ${deposit.status === 'pending' ? `
+                <div class="action-buttons">
+                    <button class="action-btn btn-approve" onclick="approveDeposit('${deposit.id}')">Aprovar</button>
+                    <button class="action-btn btn-reject" onclick="rejectDeposit('${deposit.id}')">Rejeitar</button>
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+// Renderizar saques
+function renderWithdrawals() {
+    const container = document.getElementById('withdrawalsList');
+    const withdrawals = currentData.withdrawals;
+
+    if (!withdrawals || withdrawals.length === 0) {
+        container.innerHTML = '<div class="empty-state">Nenhum saque encontrado</div>';
+        return;
+    }
+
+    container.innerHTML = withdrawals.map(withdrawal => `
+        <div class="item-card">
+            <div class="item-header">
+                <div class="item-title">${withdrawal.user_mobile || 'Usuário ' + withdrawal.user_id}</div>
+                <div class="item-date">${formatDate(withdrawal.created_at)}</div>
+            </div>
+            <div class="item-details">
+                <div class="detail-item">
+                    <div class="detail-label">Valor</div>
+                    <div class="detail-value">KZ ${formatNumber(withdrawal.amount)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Líquido</div>
+                    <div class="detail-value">KZ ${formatNumber(withdrawal.net_amount || withdrawal.amount)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Banco</div>
+                    <div class="detail-value">${withdrawal.bank_name || '-'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Conta</div>
+                    <div class="detail-value">${withdrawal.account_name || '-'}</div>
+                </div>
+            </div>
+            <div class="status-badge status-${withdrawal.status}">
+                ${getStatusText(withdrawal.status)}
+            </div>
+            ${withdrawal.status === 'pending' ? `
+                <div class="action-buttons">
+                    <button class="action-btn btn-approve" onclick="approveWithdrawal('${withdrawal.id}')">Aprovar</button>
+                    <button class="action-btn btn-reject" onclick="rejectWithdrawal('${withdrawal.id}')">Rejeitar</button>
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+// Renderizar usuários
+function renderUsers() {
+    const container = document.getElementById('usersList');
+    const users = currentData.users;
+
+    if (!users || users.length === 0) {
+        container.innerHTML = '<div class="empty-state">Nenhum usuário encontrado</div>';
+        return;
+    }
+
+    container.innerHTML = users.map(user => `
+        <div class="item-card">
+            <div class="item-header">
+                <div class="item-title">${user.mobile}</div>
+                <div class="item-date">${formatDate(user.created_at)}</div>
+            </div>
+            <div class="item-details">
+                <div class="detail-item">
+                    <div class="detail-label">Saldo</div>
+                    <div class="detail-value">KZ ${formatNumber(user.saldo || 0)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Código</div>
+                    <div class="detail-value">${user.invitation_code || '-'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Indicações</div>
+                    <div class="detail-value">${user.referral_count || 0}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Compras</div>
+                    <div class="detail-value">${user.purchase_count || 0}</div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn btn-pending" onclick="viewUserDetails('${user.id}')">Ver Detalhes</button>
+                <button class="action-btn btn-process" onclick="viewUserTransactions('${user.id}')">Transações</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Renderizar transações
+function renderTransactions() {
+    const container = document.getElementById('transactionsList');
+    const transactions = currentData.transactions;
+
+    if (!transactions || transactions.length === 0) {
+        container.innerHTML = '<div class="empty-state">Nenhuma transação encontrada</div>';
+        return;
+    }
+
+    container.innerHTML = transactions.map(transaction => `
+        <div class="item-card">
+            <div class="item-header">
+                <div class="item-title">${transaction.user_mobile || 'Usuário ' + transaction.user_id}</div>
+                <div class="item-date">${formatDate(transaction.created_at)}</div>
+            </div>
+            <div class="item-details">
+                <div class="detail-item">
+                    <div class="detail-label">Tipo</div>
+                    <div class="detail-value">${getTransactionType(transaction.type)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Valor</div>
+                    <div class="detail-value ${transaction.amount < 0 ? 'status-rejected' : 'status-approved'}">
+                        ${transaction.amount > 0 ? '+' : ''}KZ ${formatNumber(Math.abs(transaction.amount))}
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Saldo Final</div>
+                    <div class="detail-value">KZ ${formatNumber(transaction.balance_after || 0)}</div>
+                </div>
+            </div>
+            <div class="detail-label" style="text-align: center; margin-top: 10px;">
+                ${transaction.description || 'Transação realizada'}
+            </div>
+        </div>
+    `).join('');
+}
+
+// Aprovar depósito
+async function approveDeposit(depositId) {
+    showConfirmationModal(
+        'Aprovar Depósito',
+        'Tem certeza que deseja aprovar este depósito? O valor será creditado na conta do usuário.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/deposit/${depositId}/approve`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Depósito aprovado com sucesso!');
+                    loadDashboardData();
+                } else {
+                    showError('Erro ao aprovar depósito: ' + (data.message || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                console.error('Erro ao aprovar depósito:', error);
+                showError('Erro de conexão');
+            }
+        }
+    );
+}
+
+// Rejeitar depósito
+async function rejectDeposit(depositId) {
+    showConfirmationModal(
+        'Rejeitar Depósito',
+        'Tem certeza que deseja rejeitar este depósito? Esta ação não pode ser desfeita.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/deposit/${depositId}/reject`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reason: 'Rejeitado pelo administrador' })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Depósito rejeitado com sucesso!');
+                    loadDashboardData();
+                } else {
+                    showError('Erro ao rejeitar depósito: ' + (data.message || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                console.error('Erro ao rejeitar depósito:', error);
+                showError('Erro de conexão');
+            }
+        }
+    );
+}
+
+// Aprovar saque
+async function approveWithdrawal(withdrawalId) {
+    showConfirmationModal(
+        'Aprovar Saque',
+        'Tem certeza que deseja aprovar este saque? O valor será debitado e transferido para o usuário.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/withdrawal/${withdrawalId}/approve`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Saque aprovado com sucesso!');
+                    loadDashboardData();
+                } else {
+                    showError('Erro ao aprovar saque: ' + (data.message || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                console.error('Erro ao aprovar saque:', error);
+                showError('Erro de conexão');
+            }
+        }
+    );
+}
+
+// Rejeitar saque
+async function rejectWithdrawal(withdrawalId) {
+    showConfirmationModal(
+        'Rejeitar Saque',
+        'Tem certeza que deseja rejeitar este saque? O valor será devolvido para a conta do usuário.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/withdrawal/${withdrawalId}/reject`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reason: 'Rejeitado pelo administrador' })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Saque rejeitado com sucesso!');
+                    loadDashboardData();
+                } else {
+                    showError('Erro ao rejeitar saque: ' + (data.message || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                console.error('Erro ao rejeitar saque:', error);
+                showError('Erro de conexão');
+            }
+        }
+    );
+}
+
+// Processar rendimentos
+async function processPayouts() {
+    showConfirmationModal(
+        'Processar Rendimentos',
+        'Tem certeza que deseja processar todos os rendimentos pendentes? Esta ação creditará os rendimentos diários para todos os usuários com investimentos ativos.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/process-payouts`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(`Rendimentos processados com sucesso! ${data.data.processed} pagamentos realizados. Total: KZ ${formatNumber(data.data.total_amount)}`);
+                    loadDashboardData();
+                } else {
+                    showError('Erro ao processar rendimentos: ' + (data.message || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                console.error('Erro ao processar rendimentos:', error);
+                showError('Erro de conexão');
+            }
+        }
+    );
+}
+
+// Ver detalhes do usuário
+function viewUserDetails(userId) {
+    const user = currentData.users.find(u => u.id === userId);
+    if (user) {
+        showMessage(`Detalhes do usuário:\n\nTelefone: ${user.mobile}\nSaldo: KZ ${formatNumber(user.saldo || 0)}\nCódigo: ${user.invitation_code || 'N/A'}\nCadastro: ${formatDate(user.created_at)}\nIndicações: ${user.referral_count || 0}\nCompras: ${user.purchase_count || 0}`);
+    }
+}
+
+// Ver transações do usuário
+function viewUserTransactions(userId) {
+    const user = currentData.users.find(u => u.id === userId);
+    const userTransactions = currentData.transactions.filter(t => t.user_id === userId);
+    
+    if (user) {
+        let message = `Transações de ${user.mobile}:\n\n`;
+        userTransactions.slice(0, 10).forEach(t => {
+            message += `${formatDate(t.created_at)} - ${getTransactionType(t.type)}: ${t.amount > 0 ? '+' : ''}KZ ${formatNumber(Math.abs(t.amount))}\n`;
+        });
+        
+        if (userTransactions.length > 10) {
+            message += `\n... e mais ${userTransactions.length - 10} transações`;
+        }
+        
+        showMessage(message);
+    }
+}
+
+// Mostrar estatísticas do sistema
+function showSystemStats() {
+    const totalDeposits = currentData.deposits
+        .filter(d => d.status === 'completed')
+        .reduce((sum, d) => sum + d.amount, 0);
+        
+    const totalWithdrawals = currentData.withdrawals
+        .filter(w => w.status === 'completed')
+        .reduce((sum, w) => sum + w.amount, 0);
+        
+    const pendingDeposits = currentData.deposits.filter(d => d.status === 'pending').length;
+    const pendingWithdrawals = currentData.withdrawals.filter(w => w.status === 'pending').length;
+    
+    showMessage(`Estatísticas do Sistema:\n\nTotal de Usuários: ${currentData.users.length}\nSaldo Total: KZ ${formatNumber(currentData.users.reduce((sum, u) => sum + (u.saldo || 0), 0))}\nTotal Depósitos: KZ ${formatNumber(totalDeposits)}\nTotal Saques: KZ ${formatNumber(totalWithdrawals)}\nDepósitos Pendentes: ${pendingDeposits}\nSaques Pendentes: ${pendingWithdrawals}`);
+}
+
+// Mostrar ferramentas admin
+function showAdminTools() {
+    showMessage('Ferramentas Administrativas:\n\n• Processar Rendimentos - Executa pagamentos diários\n• Limpar Cache - Limpa cache do sistema\n• Backup de Dados - Cria backup do banco\n• Logs do Sistema - Visualiza logs de atividade\n• Manutenção - Coloca sistema em manutenção');
+}
+
+// Alternar entre abas
+function switchTab(tabName) {
+    // Fechar menu
+    toggleMenu();
+    
+    // Atualizar menu ativo
+    document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+    document.querySelector(`.menu-item:nth-child(${getMenuIndex(tabName)})`).classList.add('active');
+    
+    // Atualizar título da página
+    const titles = {
+        'dashboard': 'Painel Administrativo',
+        'deposits': 'Gerenciar Depósitos',
+        'withdrawals': 'Gerenciar Saques',
+        'users': 'Gerenciar Usuários',
+        'transactions': 'Histórico de Transações'
+    };
+    document.getElementById('pageTitle').textContent = titles[tabName] || 'Painel Administrativo';
+    
+    // Remover classe active de todas as abas e conteúdos
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    // Adicionar classe active à aba e conteúdo selecionados
+    if (tabName !== 'dashboard') {
+        document.querySelector(`.tab:nth-child(${getTabIndex(tabName)})`).classList.add('active');
+        document.getElementById(`${tabName}Content`).classList.add('active');
+    }
+    
+    // Recarregar dados se necessário
+    if (tabName === 'deposits') loadDeposits();
+    else if (tabName === 'withdrawals') loadWithdrawals();
+    else if (tabName === 'users') loadUsers();
+    else if (tabName === 'transactions') loadTransactions();
+}
+
+function getTabIndex(tabName) {
+    const tabs = ['deposits', 'withdrawals', 'users', 'transactions'];
+    return tabs.indexOf(tabName) + 1;
+}
+
+function getMenuIndex(tabName) {
+    const menuItems = ['dashboard', 'deposits', 'withdrawals', 'users', 'transactions', 'payouts', 'stats', 'tools'];
+    return menuItems.indexOf(tabName) + 1;
+}
+
+// Atualizar dados
+function refreshData() {
+    loadDashboardData();
+    showMessage('Dados atualizados com sucesso!');
+}
+
+// Modal de confirmação
+function showConfirmationModal(title, message, confirmCallback) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalMessage').textContent = message;
+    document.getElementById('confirmAction').onclick = confirmCallback;
+    document.getElementById('confirmationModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('confirmationModal').style.display = 'none';
+}
+
+// Funções auxiliares
+function formatNumber(num) {
+    return new Intl.NumberFormat('pt-AO').format(num || 0);
+}
+
+function formatDate(dateString) {
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-AO', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (e) {
+        return dateString;
+    }
+}
+
+function getStatusText(status) {
+    const statusMap = {
+        'pending': 'Pendente',
+        'completed': 'Aprovado',
+        'failed': 'Rejeitado',
+        'approved': 'Aprovado',
+        'rejected': 'Rejeitado'
+    };
+    return statusMap[status] || status;
+}
+
+function getTransactionType(type) {
+    const typeMap = {
+        'deposit': 'Depósito',
+        'withdrawal': 'Saque',
+        'purchase': 'Compra',
+        'referral_bonus': 'Bônus',
+        'daily_checkin': 'Check-in',
+        'product_income': 'Rendimento',
+        'payout': 'Pagamento'
+    };
+    return typeMap[type] || type;
+}
+
+function showMessage(message) {
+    alert(message); // Em produção, usar um toast mais elegante
+}
+
+function showError(message) {
+    alert('Erro: ' + message); // Em produção, usar um toast mais elegante
+}
+
+// Fechar modal ao clicar fora
+document.getElementById('confirmationModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+</script>
+</body>
+</html>
